@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Auth v2.0 | Dev By Bruh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #5b21b6;
+            --secondary: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --error: #ef4444;
+            --dark: #0f0f1a;
+            --darker: #080810;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--darker);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.1) 0%, transparent 40%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-5%, 5%) rotate(5deg); }
+            50% { transform: translate(5%, -5%) rotate(-5deg); }
+            75% { transform: translate(-3%, -3%) rotate(3deg); }
+        }
+
+        /* Floating Orbs */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            animation: orbFloat 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--primary);
+            opacity: 0.2;
+            top: -100px;
+            right: -100px;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--secondary);
+            opacity: 0.15;
+            bottom: -50px;
+            left: -50px;
+            animation-delay: -5s;
+        }
+
+        .orb-3 {
+            width: 200px;
+            height: 200px;
+            background: var(--accent);
+            opacity: 0.1;
+            top: 50%;
+            left: 50%;
+            animation-delay: -10s;
+        }
+
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        /* Grid Pattern */
+        .grid-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(124, 58, 237, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124, 58, 237, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+        }
+
+        /* Main Container */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        /* Version Badge */
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 8px 16px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .version-badge span {
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(124, 58, 237, 0.6); }
+        }
+
+        /* Card */
+        .card {
+            background: rgba(15, 15, 26, 0.8);
+            backdrop-filter: blur(40px);
+            border-radius: 24px;
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 40px;
+            width: 100%;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(124, 58, 237, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--secondary), transparent);
+            animation: cardShine 3s linear infinite;
+        }
+
+        @keyframes cardShine {
+            to { left: 100%; }
+        }
+
+        /* Logo */
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .logo-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+            box-shadow: 
+                0 20px 40px rgba(124, 58, 237, 0.4),
+                inset 0 -5px 20px rgba(0, 0, 0, 0.2);
+            transform: rotate(-5deg);
+            transition: transform 0.3s ease;
+        }
+
+        .logo-icon:hover {
+            transform: rotate(5deg) scale(1.05);
+        }
+
+        .logo-icon svg {
+            width: 45px;
+            height: 45px;
+            fill: white;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+
+        .logo-ring {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid rgba(124, 58, 237, 0.3);
+            border-radius: 30px;
+            animation: ringPulse 2s ease-out infinite;
+        }
+
+        @keyframes ringPulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.7));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 30px;
+            display: flex;
+            position: relative;
+        }
+
+        .tab-slider {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            width: calc(50% - 6px);
+            height: calc(100% - 12px);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .tab-slider.login {
+            transform: translateX(100%);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            border-radius: 12px;
+            transition: color 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab.active {
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Form Sections */
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeSlide 0.4s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Info Box */
+        .info-box {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+        }
+
+        .info-box h3 {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-box h3 svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--secondary);
+        }
+
+        .info-box p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Steps */
+        .steps {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-circle {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 5px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .step.completed .step-circle {
+            background: var(--success);
+            border-color: transparent;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step.active .step-label,
+        .step.completed .step-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .step-line {
+            width: 30px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        label svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--primary);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px;
+            padding-left: 50px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            fill: rgba(255, 255, 255, 0.3);
+            transition: fill 0.3s ease;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(124, 58, 237, 0.05);
+            box-shadow: 0 0 30px rgba(124, 58, 237, 0.15);
+        }
+
+        input:focus + .input-icon,
+        input:valid + .input-icon {
+            fill: var(--primary);
+        }
+
+        /* Button */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Messages */
+        .message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: messageSlide 0.4s ease;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .message.success {
+            display: flex;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .message.success svg { fill: var(--success); }
+
+        .message.error {
+            display: flex;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+        }
+
+        .message.error svg { fill: var(--error); }
+
+        .message.info {
+            display: flex;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--secondary);
+        }
+
+        .message.info svg { fill: var(--secondary); }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-secure {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .footer-secure svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--success);
+        }
+
+        .dev-credit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dev-credit span {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+
+        .dev-credit strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .dev-credit .version {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .card {
+                padding: 30px 25px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .steps {
+                gap: 15px;
+            }
+
+            .step-line {
+                width: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="bg-animation"></div>
+    <div class="grid-pattern"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="main-container">
+        <!-- Version Badge -->
+        <div class="version-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+            </svg>
+            <span>Version 2.0 Released</span>
+        </div>
+
+        <div class="card">
+            <!-- Logo -->
+            <div class="logo">
+                <div class="logo-container">
+                    <div class="logo-ring"></div>
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h1>Secure Auth</h1>
+                <p class="subtitle">Next-Gen Authentication System</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <div class="tab-slider" id="tab-slider"></div>
+                <div class="tab active" onclick="switchTab('register')" id="tab-register">
+                    Register
+                </div>
+                <div class="tab" onclick="switchTab('login')" id="tab-login">
+                    Login
+                </div>
+            </div>
+
+            <!-- Register Section -->
+            <div id="register-section" class="form-section active">
+                <div class="info-box">
+                    <h3>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                        </svg>
+                        How it works?
+                    </h3>
+                    <p>Enter your Discord webhook URL. A unique access token will be sent to your channel. Use this token to log in securely.</p>
+                </div>
+
+                <div id="register-message" class="message"></div>
+
+                <form id="register-form">
+                    <div class="input-group">
+                        <label>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+                            </svg>
+                            Discord Webhook URL
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="url" 
+                                id="webhook" 
+                                placeholder="https://discord.com/api/webhooks/..."
+                                required
+                            >
+                            <svg class="input-icon" viewBox="0 0 24 24">
+                                <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                            Username
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="username" 
+                                placeholder="Enter your username"
+                                required
+                                minlength="3"
+                            >
+                            <svg class="input-icon" viewBox="0 0 24 24">
+                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="register-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                        </svg>
+                        Create Account
+                    </button>
+                </form>
+            </div>
+
+            <!-- Login Section -->
+            <div id="login-section" class="form-section">
+                <div class="steps">
+                    <div class="step completed">
+                        <div class="step-circle">✓</div>
+                        <span class="step-label">Register</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step active">
+                        <div class="step-circle">2</div>
+                        <span class="step-label">Login</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <div class="step-circle">3</div>
+                        <span class="step-label">Access</span>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3>
+                        <svg viewBox="0 0 24 24">
+                            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+                        </svg>
+                        Token Authentication
+                    </h3>
+                    <p>Enter the access token that was sent to your Discord channel to gain access to the secure area.</p>
+                </div>
+
+                <div id="login-message" class="message"></div>
+
+                <form id="login-form">
+                    <div class="input-group">
+                        <label>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+                            </svg>
+                            Access Token
+                        </label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="text" 
+                                id="token" 
+                                placeholder="Enter your token (SEC-XXXX...)"
+                                required
+                            >
+                            <svg class="input-icon" viewBox="0 0 24 24">
+                                <path d="M12.65 10C11.83 7.67 9.61 6 7 6c-3.31 0-6 2.69-6 6s2.69 6 6 6c2.61 0 4.83-1.67 5.65-4H17v4h4v-4h2v-4H12.65zM7 14c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn" id="login-btn">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/>
+                        </svg>
+                        Login Now
+                    </button>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="footer-secure">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                    </svg>
+                    Secure & Encrypted Connection
+                </div>
+                <div class="dev-credit">
+                    <span>Dev By</span>
+                    <strong>Bruh</strong>
+                    <span class="version">v2.0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Token Storage (simulates database)
+        let registeredTokens = JSON.parse(localStorage.getItem('bruh_tokens') || '{}');
+
+        // Generate unique token
+        function generateToken() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let token = 'SEC-';
+            for (let i = 0; i < 20; i++) {
+                if (i > 0 && i % 4 === 0) token += '-';
+                token += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return token;
+        }
+
+        // Switch tabs
+        function switchTab(tab) {
+            const slider = document.getElementById('tab-slider');
+            const tabRegister = document.getElementById('tab-register');
+            const tabLogin = document.getElementById('tab-login');
+            
+            if (tab === 'register') {
+                slider.classList.remove('login');
+                tabRegister.classList.add('active');
+                tabLogin.classList.remove('active');
+                document.getElementById('register-section').classList.add('active');
+                document.getElementById('login-section').classList.remove('active');
+            } else {
+                slider.classList.add('login');
+                tabLogin.classList.add('active');
+                tabRegister.classList.remove('active');
+                document.getElementById('login-section').classList.add('active');
+                document.getElementById('register-section').classList.remove('active');
+            }
+            
+            // Clear messages
+            clearMessages();
+        }
+
+        // Clear messages
+        function clearMessages() {
+            document.getElementById('register-message').className = 'message';
+            document.getElementById('register-message').innerHTML = '';
+            document.getElementById('login-message').className = 'message';
+            document.getElementById('login-message').innerHTML = '';
+        }
+
+        // Show message
+        function showMessage(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            let icon = '';
+            
+            if (type === 'success') {
+                icon = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+            } else if (type === 'error') {
+                icon = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
+            } else {
+                icon = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>';
+            }
+            
+            el.innerHTML = icon + '<span>' + message + '</span>';
+            el.className = `message ${type}`;
+        }
+
+        // Register form handler
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const webhook = document.getElementById('webhook').value;
+            const username = document.getElementById('username').value;
+            const btn = document.getElementById('register-btn');
+            
+            // Validate webhook
+            if (!webhook.includes('discord.com/api/webhooks/')) {
+                showMessage('register-message', 'Invalid Discord webhook URL!', 'error');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showMessage('register-message', 'Username must be at least 3 characters!', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner"></div> Sending...';
+            
+            // Generate token
+            const token = generateToken();
+            const timestamp = new Date().toISOString();
+            
+            // Discord embed message
+            const embedMessage = {
+                username: "🔐 Secure Auth v2.0",
+                avatar_url: "https://i.imgur.com/AfFp7pu.png",
+                embeds: [{
+                    title: "🎉 Account Created Successfully!",
+                    description: "Your secure access token has been generated.",
+                    color: 0x7c3aed,
+                    fields: [
+                        {
+                            name: "👤 Username",
+                            value: `\`${username}\``,
+                            inline: true
+                        },
+                        {
+                            name: "📅 Created At",
+                            value: `\`${new Date().toLocaleString()}\``,
+                            inline: true
+                        },
+                        {
+                            name: "🔑 Your Access Token",
+                            value: `\`\`\`${token}\`\`\``,
+                            inline: false
+                        },
+                        {
+                            name: "📋 Instructions",
+                            value: "1️⃣ Copy the token above\n2️⃣ Go to the **Login** page\n3️⃣ Paste your token and click Login\n4️⃣ You'll be redirected to the secure area",
+                            inline: false
+                        }
+                    ],
+                    footer: {
+                        text: "Secure Auth v2.0 • Dev By Bruh • Keep your token safe!"
+                    },
+                    timestamp: timestamp
+                }]
+            };
+            
+            try {
+                const response = await fetch(webhook, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(embedMessage)
+                });
+                
+                if (response.ok || response.status === 204) {
+                    // Save token
+                    registeredTokens[token] = {
+                        username: username,
+                        createdAt: timestamp,
+                        webhook: webhook.substring(0, 50) + '...'
+                    };
+                    localStorage.setItem('bruh_tokens', JSON.stringify(registeredTokens));
+                    
+                    showMessage('register-message', 
+                        'Success! Token sent to your Discord channel. Switch to Login tab.', 
+                        'success');
+                    
+                    // Reset form
+                    document.getElementById('webhook').value = '';
+                    document.getElementById('username').value = '';
+                    
+                    // Auto switch to login
+                    setTimeout(() => {
+                        switchTab('login');
+                    }, 2500);
+                    
+                } else {
+                    throw new Error('Webhook error: ' + response.status);
+                }
+            } catch (error) {
+                console.error(error);
+                showMessage('register-message', 
+                    'Error: Could not send to webhook. Check the URL and try again.', 
+                    'error');
+            }
+            
+            btn.disabled = false;
+            btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg> Create Account';
+        });
+
+        // Login form handler
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const token = document.getElementById('token').value.trim();
+            const btn = document.getElementById('login-btn');
+            
+            if (!token) {
+                showMessage('login-message', 'Please enter your access token!', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<div class="loading-spinner"></div> Verifying...';
+            
+            // Simulate verification delay
+            setTimeout(() => {
+                if (registeredTokens[token]) {
+                    const user = registeredTokens[token];
+                    showMessage('login-message', 
+                        `Welcome back, ${user.username}! Redirecting to secure area...`, 
+                        'success');
+                    
+                    // Update step indicator
+                    document.querySelectorAll('.step')[2].classList.add('active');
+                    
+                    // Redirect after delay
+                    setTimeout(() => {
+                        window.location.href = 'https://bruhdiscordhack.vercel.app';
+                    }, 2000);
+                    
+                } else {
+                    showMessage('login-message', 
+                        'Invalid token! Please check your token and try again.', 
+                        'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5-5-5zm9 12h-8v2h8c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-8v2h8v14z"/></svg> Login Now';
+                }
+            }, 1500);
+        });
+
+        // Add some visual feedback on input
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
